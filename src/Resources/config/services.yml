@@ -1,0 +1,25 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  MercuryKojo\Bundle\UniversalCommentBundle\Controller\:
+    resource: '../../Controller'
+    public: true
+    tags: ['controller.service_arguments']
+
+
+  MercuryKojo\Bundle\UniversalCommentBundle\Installer:
+    public: true
+    arguments:
+      # fetch the bundle via expression language
+      $bundle: "@=service('kernel').getBundle('UniversalCommentBundle')"
+
+
+  MercuryKojo\Bundle\UniversalCommentBundle\Templating\Helper\UniversalCommentHelper:
+    public: true
+    arguments: ['@templating.engine.php', '@request_stack']
+    tags:
+    - { name: templating.helper, alias: universalComment }
+
