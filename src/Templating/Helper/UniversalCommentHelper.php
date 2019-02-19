@@ -32,6 +32,7 @@ class UniversalCommentHelper extends Helper
      * - page (int) [optional] overrides automatic page from request
      * - pageRange (int) [optional] overrides zend pagination default
      * - replyable (bool) [false]
+     * - validatedOnly (bool) [false] only validated comments will be shown
      *
      * @throws \Exception
      * @return string
@@ -45,6 +46,9 @@ class UniversalCommentHelper extends Helper
 
         $comments = new UniversalComment\Listing();
         $comments->addConditionParam('sourceId = :id AND parentComment__id IS NULL', ['id' => $id]);
+        if (isset($config['validatedOnly']) && $config['validatedOnly']) {
+            $comments->addConditionParam('validated = 1');
+        }
 
         $paginator = new Paginator($comments);
         $paginator->setItemCountPerPage(isset($config['itemCountPerPage']) ? $config['itemCountPerPage'] : 6);
@@ -58,6 +62,33 @@ class UniversalCommentHelper extends Helper
             $template = $config['template'];
         }
 
-        return $this->engine->template($template, ['replyable' => ($config['replyable'] == true), 'comments' => $paginator, 'id' => $id]);
+        // get subcomments if replyable
+        $subCommentsArray = [];
+        if (isset($config['replyable']) && $config['replyable']) {
+            /**
+             * @var UniversalComment $comment
+             */
+            foreach ($paginator as $comment) {
+                $subComments = new UniversalComment\Listing();
+                $subComments->addConditionParam('parentComment__id = :id', ['id' => $comment->getId()]);
+                if (isset($config['validatedOnly']) && $config['validatedOnly'] == true) {
+                    $subComments->addConditionParam('validated = 1');
+                }
+
+                if ($subComments->getCount()) {
+                    $subCommentsArray[] = $subComments->load();
+                }
+            }
+        }
+
+        return $this->engine->template($template, [
+            'replyable' => ($config['replyable'] == true),
+            'comments' => $paginator,
+            'id' => $id,
+            'validatedOnly' => ($config['validatedOnly'] == true),
+            'subComments' => $subCommentsArray
+        ]);
     }
+
+
 }
