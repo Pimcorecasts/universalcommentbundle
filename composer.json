@@ -8,7 +8,7 @@
     }
   },
   "require": {
-    "pimcore/core-version": "^5.1",
+    "pimcore/pimcore": "^6.0",
     "erusev/parsedown": "^1.7",
     "erusev/parsedown-extra": "^0.7.1"
   },

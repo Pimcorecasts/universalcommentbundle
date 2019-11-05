@@ -9,6 +9,12 @@ services:
     public: true
     tags: ['controller.service_arguments']
 
+  # Twig extensions
+  MercuryKojo\Bundle\UniversalCommentBundle\Twig\:
+    resource: '../../Twig'
+    public: true
+    tags: ['twig.extension']
+
 
   MercuryKojo\Bundle\UniversalCommentBundle\Installer:
     public: true
@@ -19,7 +25,7 @@ services:
 
   MercuryKojo\Bundle\UniversalCommentBundle\Templating\Helper\UniversalCommentHelper:
     public: true
-    arguments: ['@templating.engine.php', '@request_stack']
+    arguments: ['@Symfony\Component\Templating\EngineInterface', '@request_stack']
     tags:
     - { name: templating.helper, alias: universalComment }
 

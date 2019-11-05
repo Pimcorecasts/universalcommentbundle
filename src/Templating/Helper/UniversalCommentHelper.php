@@ -2,8 +2,8 @@
 namespace MercuryKojo\Bundle\UniversalCommentBundle\Templating\Helper;
 
 use Pimcore\Model\DataObject\UniversalComment;
-use Pimcore\Templating\PhpEngine;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\Helper\Helper;
 use Zend\Paginator\Paginator;
 
@@ -17,7 +17,7 @@ class UniversalCommentHelper extends Helper
     private $engine;
     private $request;
 
-    public function __construct(PhpEngine $engine, RequestStack $requestStack)
+    public function __construct(EngineInterface $engine, RequestStack $requestStack)
     {
         $this->engine = $engine;
         $this->request = $requestStack->getMasterRequest();
@@ -81,7 +81,7 @@ class UniversalCommentHelper extends Helper
             }
         }
 
-        return $this->engine->template($template, [
+        return $this->engine->render($template, [
             'replyable' => ($config['replyable'] == true),
             'comments' => $paginator,
             'id' => $id,
