@@ -7,7 +7,8 @@
  * @var string $id
  */
 
-$this->headLink()->appendStylesheet('/static/plugins/summernote/summernote-bs4.css'); ?>
+$this->headLink()->appendStylesheet('/bundles/universalcomment/summernote/summernote-bs4.css');
+$this->headScript()->appendFile('/bundles/universalcomment/summernote/summernote-bs4.js'); ?>
 <div class="container clearfix" id="<?= $id ?>">
     <div class="clearfix m-t-30 m-b-20">
         <h5 class="m-t-10 m-b-0 float-left"><i class="fa fa-comment-o m-r-5"></i> <?= $this->t('ucb.container.Comments') ?> (<?= $comments->getTotalItemCount() ?>)</h5>

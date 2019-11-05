@@ -1,6 +1,7 @@
 <?php
 namespace MercuryKojo\Bundle\UniversalCommentBundle\Templating\Helper;
 
+use Pimcore\File;
 use Pimcore\Model\DataObject\UniversalComment;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Templating\EngineInterface;
@@ -39,6 +40,7 @@ class UniversalCommentHelper extends Helper
      */
     public function __invoke(string $id, array $config = [])
     {
+        $id = File::getValidFilename($id);
         $page = $config['page'];
         if ($page == '') {
             $page = $this->request->get(isset($config['pageParam']) ? $config['pageParam'] : 'page', 1);
@@ -50,6 +52,9 @@ class UniversalCommentHelper extends Helper
             $comments->addConditionParam('validated = 1');
         }
 
+        $comments->setOrderKey('o_creationDate');
+        $comments->setOrder('DESC');
+
         $paginator = new Paginator($comments);
         $paginator->setItemCountPerPage(isset($config['itemCountPerPage']) ? $config['itemCountPerPage'] : 6);
         $paginator->setCurrentPageNumber($page);
@@ -57,7 +62,7 @@ class UniversalCommentHelper extends Helper
             $paginator->setPageRange($config['pageRange']);
         }
 
-        $template = 'UniversalCommentBundle::container.html.php';
+        $template = 'UniversalCommentBundle::container.html.twig';
         if ($config['template'] != '') {
             $template = $config['template'];
         }
@@ -74,9 +79,11 @@ class UniversalCommentHelper extends Helper
                 if (isset($config['validatedOnly']) && $config['validatedOnly'] == true) {
                     $subComments->addConditionParam('validated = 1');
                 }
+                $subComments->setOrderKey('o_creationDate');
+                $subComments->setOrder('DESC');
 
                 if ($subComments->getCount()) {
-                    $subCommentsArray[] = $subComments->load();
+                    $subCommentsArray[$comment->getId()] = $subComments->load();
                 }
             }
         }
@@ -84,6 +91,8 @@ class UniversalCommentHelper extends Helper
         return $this->engine->render($template, [
             'replyable' => ($config['replyable'] == true),
             'comments' => $paginator,
+            'pagingVariables' => get_object_vars($paginator->getPages('Sliding')),
+            'pageParam' => isset($config['pageParam']) ? $config['pageParam'] : 'page',
             'id' => $id,
             'validatedOnly' => ($config['validatedOnly'] == true),
             'subComments' => $subCommentsArray

@@ -1,0 +1,3 @@
+mercurykojo_comments:
+  resource: "@UniversalCommentBundle/Controller/"
+  type:     annotation

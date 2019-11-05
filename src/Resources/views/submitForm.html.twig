@@ -1,0 +1,22 @@
+{#
+@var \Pimcore\Templating\PhpEngine $this
+@var \Pimcore\Templating\PhpEngine $view
+@var \Pimcore\Templating\GlobalVariables $app
+#}
+{% do jsConfig().add({'summernote': true}) %}
+{% if app.user %}
+    <h5 class="m-t-60 m-b-20">{{ 'ucb.Write a comment'|trans }}</h5>
+    <form action="{{ path('ucb_comment_add') }}" method="post">
+        <input type="hidden" name="_target_path" value="{{ app.request.pathInfo }}">
+        <input type="hidden" name="id" value="{{ id }}">
+        {% if commentId|default('') != '' %}
+            <input type="hidden" name="commendId" value="{{ commentId }}">
+        {% endif %}
+        <textarea class="summernote" name="editordata"></textarea>
+        <button class="btn btn-primary btn-shadow float-right" type="submit">{{ 'ucb.form.Submit'|trans }}</button>
+    </form>
+{% else %}
+    <div class="alert alert-info">
+        {{ 'If you want to participate in the discussions. Please log in or consider registering'|trans|raw }}
+    </div>
+{% endif %}

@@ -1,0 +1,38 @@
+{#
+@var \Pimcore\Templating\PhpEngine $this
+@var \Pimcore\Templating\PhpEngine $view
+@var \Pimcore\Templating\GlobalVariables $app
+@var \Zend\Paginator\Paginator $comments
+@var string $id
+#}
+
+<div class="container clearfix" id="{{ id }}">
+    <div class="clearfix m-t-30 m-b-20">
+        <h5 class="m-t-10 m-b-0 float-left"><i class="fa fa-comment-o m-r-5"></i> {{ 'ucb.container.Comments'|trans }} ({{ comments.totalItemCount }})</h5>
+    </div>
+
+    <ul>
+        {% if comments.totalItemCount %}
+            {% for key, comment in comments %}
+                {{ include('@UniversalComment/commentLine.html.twig', {'comment': comment, 'id': id}) }}
+            {% endfor %}
+        {% else %}
+            <li class="forum-reply">
+                <div class="alert alert-info">
+                    <strong>{{ 'ucb.container.no comments'|trans }}</strong>
+                </div>
+            </li>
+        {% endif %}
+    </ul>
+
+    {% if comments.totalItemCount %}
+        {{ include('@UniversalComment/paging.html.twig', pagingVariables|merge({
+            'paginator': comments,
+            'hideCount': true,
+            'addClass': 'm-b-60',
+            'pageParam': pageParam
+        })) }}
+    {% endif %}
+
+    {{ include('UniversalCommentBundle::submitForm.html.twig', {'id': id }) }}
+</div>
