@@ -1,5 +1,5 @@
 {
-  "name": "mercurykojo/pimcore-markdown-bundle",
+  "name": "mercurykojo/universal-comments-bundle",
   "type": "pimcore-bundle",
   "license": "GPL-3.0",
   "autoload": {
