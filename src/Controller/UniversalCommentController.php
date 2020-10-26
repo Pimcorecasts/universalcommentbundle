@@ -69,7 +69,10 @@ class UniversalCommentController extends FrontendController {
             }
             $comment->setContent($content);
             $comment->setSourceId($id);
+
+            // TODO preAdd Event
             $comment->save();
+            // TODO postAdd Event
         } else {
             $this->logger->warning('No Content Comment. Data: ' . json_encode($request->request->all()), ['component' => 'UniversalCommentBundle']);
         }
@@ -89,6 +92,7 @@ class UniversalCommentController extends FrontendController {
             $comment = UniversalComment::getById(intval($id));
             if ($comment instanceof UniversalComment) {
                 if ($comment->getPoster() && $comment->getPoster()->getId() == $user->getId()) {
+                    // TODO delete or unpublish only? let admin user also delete post
                     $comment->delete();
                 } else {
                     $this->logger->warning('User not allowes to delete Comment. Data: ' . json_encode($request->request->all()), ['component' => 'UniversalCommentBundle']);
