@@ -91,8 +91,7 @@ class UniversalCommentController extends FrontendController {
         if (intval($id)) {
             $comment = UniversalComment::getById(intval($id));
             if ($comment instanceof UniversalComment) {
-                if ($comment->getPoster() && $comment->getPoster()->getId() == $user->getId()) {
-                    // TODO delete or unpublish only? let admin user also delete post
+                if (in_array('ROLE_UCB_ADMIN', $user->getRoles()) || ($comment->getPoster() && $comment->getPoster()->getId() == $user->getId())) {
                     $comment->delete();
                 } else {
                     $this->logger->warning('User not allowes to delete Comment. Data: ' . json_encode($request->request->all()), ['component' => 'UniversalCommentBundle']);

@@ -4,7 +4,7 @@
     <div class="forum-header">
         <div>
             {% if user and user.image|default(false) %}
-                <a href="{{ url }}">{{ user.image.thumbnail('profile-img-sm').html({'height': 45}) }}</a>
+                <a href="{{ url }}">{{ user.image.thumbnail('profile-img-sm').html({'height': 45})|raw }}</a>
             {% endif %}
         </div>
         <div>
@@ -16,7 +16,7 @@
                 {% if replyable|default(false) and app.user %}
                     <span><a href="#"><i class="fa fa-mail-reply-all"></i> Reply</a></span>
                 {% endif %}
-                {% if app.user and user and user.id == app.user.id %}
+                {% if app.user and ('ROLE_UCB_ADMIN' in app.user.roles or (user and user.id == app.user.id)) %}
                     <span><a href="{{ path('ucb_comment_remove',{ 'id': comment.id, '_target_path': app.request.pathInfo ~ '#' ~ id }) }}"><i class="fa fa-trash"></i> {{ 'ucb.Delete Post'|trans }}</a></span>
                 {% endif %}
             </div>
