@@ -25,7 +25,7 @@ class UniversalCommentHelper extends Helper
     }
 
     /**
-     * @param string $id
+     * @param string|null $id
      * @param array $config
      * - template (string) [UniversalCommentBundle::container.html.php]
      * - itemCountPerPage (int) [6]
@@ -36,24 +36,20 @@ class UniversalCommentHelper extends Helper
      * - validatedOnly (bool) [false] only validated comments will be shown
      *
      * @throws \Exception
-     * @return string
+     * @return string|UniversalCommentHelper
      */
-    public function __invoke(string $id, array $config = [])
+    public function __invoke(string $id = null, array $config = [])
     {
+        if ($id === null) {
+            return $this;
+        }
         $id = File::getValidFilename($id);
         $page = $config['page'];
         if ($page == '') {
             $page = $this->request->get(isset($config['pageParam']) ? $config['pageParam'] : 'page', 1);
         }
 
-        $comments = new UniversalComment\Listing();
-        $comments->addConditionParam('sourceId = :id AND parentComment__id IS NULL', ['id' => $id]);
-        if (isset($config['validatedOnly']) && $config['validatedOnly']) {
-            $comments->addConditionParam('validated = 1');
-        }
-
-        $comments->setOrderKey('o_creationDate');
-        $comments->setOrder('DESC');
+        $comments = $this->getCommentListing($id, $config);
 
         $paginator = new Paginator($comments);
         $paginator->setItemCountPerPage(isset($config['itemCountPerPage']) ? $config['itemCountPerPage'] : 6);
@@ -99,5 +95,42 @@ class UniversalCommentHelper extends Helper
         ]);
     }
 
+    /**
+     * @param $id
+     * @param array $config
+     * @return int
+     */
+    public function getCommentCount($id, array $config = []) {
+        $id = File::getValidFilename($id);
+        $comments = $this->getCommentListing($id, $config);
+        return $comments->count();
+    }
 
+    /**
+     * @param $id
+     * @param array $config
+     * @return UniversalComment
+     */
+    public function getLatestComment($id, array $config = []) {
+        $id = File::getValidFilename($id);
+        $comments = $this->getCommentListing($id, $config);
+        return $comments->current();
+    }
+
+    /**
+     * @param string $id
+     * @param array $config
+     * @return UniversalComment\Listing
+     */
+    public function getCommentListing(string $id, array $config = []) {
+        $comments = new UniversalComment\Listing();
+        $comments->addConditionParam('sourceId = :id AND parentComment__id IS NULL', ['id' => $id]);
+        if (isset($config['validatedOnly']) && $config['validatedOnly']) {
+            $comments->addConditionParam('validated = 1');
+        }
+
+        $comments->setOrderKey('o_creationDate');
+        $comments->setOrder('DESC');
+        return $comments;
+    }
 }

@@ -30,13 +30,13 @@ class Extensions extends AbstractExtension
     }
 
     /**
-     * @param string $id
+     * @param string|null $id
      * @param array $config
-     * @return string
+     * @return string|UniversalCommentHelper
      * @throws \Exception
      */
-    public function universalComment( string $id, array $config = [] ){
+    public function universalComment( string $id = null, array $config = [] ){
         return $this->commentHelper->__invoke($id, $config);
     }
-    
+
 }
