@@ -4,11 +4,11 @@
   "license": "GPL-3.0",
   "autoload": {
     "psr-4": {
-      "MercuryKojo\\Bundle\\UniversalCommentBundle\\": ""
+      "MercuryKojo\\Bundle\\UniversalCommentBundle\\": "src/"
     }
   },
   "require": {
-    "pimcore/pimcore": "^6.0",
+    "pimcore/pimcore": ">=6.0",
     "erusev/parsedown": "^1.7",
     "erusev/parsedown-extra": "^0.7.1"
   },
