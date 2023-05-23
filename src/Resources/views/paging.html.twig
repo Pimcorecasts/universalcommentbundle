@@ -21,7 +21,7 @@
     {% if object is defined %}
         {% set params = params|merge({'object': object}) %}
     {% endif %}
-    {% set pages = paginator.getPages('Sliding') %}
+    {% set pages = paginator.getPaginationData() %}
 
     {% set addClassArray = [] %}
 

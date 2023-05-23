@@ -1,27 +1,18 @@
 <?php
 namespace MercuryKojo\Bundle\UniversalCommentBundle\Templating\Helper;
 
+use Knp\Component\Pager\PaginatorInterface;
 use Pimcore\File;
 use Pimcore\Model\DataObject\UniversalComment;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Templating\EngineInterface;
-use Symfony\Component\Templating\Helper\Helper;
-use Zend\Paginator\Paginator;
 
-class UniversalCommentHelper extends Helper
+class UniversalCommentHelper
 {
-    public function getName()
-    {
-        return 'Universal Comment Helper';
-    }
-
-    private $engine;
     private $request;
 
-    public function __construct(EngineInterface $engine, RequestStack $requestStack)
+    public function __construct(private EngineInterface $engine, private RequestStack $requestStack, private PaginatorInterface $paginator)
     {
-        $this->engine = $engine;
-        $this->request = $requestStack->getMasterRequest();
     }
 
     /**
@@ -40,32 +31,32 @@ class UniversalCommentHelper extends Helper
      */
     public function __invoke(string $id = null, array $config = [])
     {
+        $this->request = $this->requestStack->getMainRequest();
+
         if ($id === null) {
             return $this;
         }
         $id = File::getValidFilename($id);
-        $page = $config['page'];
+        $page = array_key_exists('page', $config) ? $config['page'] : '';
         if ($page == '') {
-            $page = $this->request->get(isset($config['pageParam']) ? $config['pageParam'] : 'page', 1);
+            $page = $this->request->get($config['pageParam'] ?? 'page', 1);
         }
 
         $comments = $this->getCommentListing($id, $config);
 
-        $paginator = new Paginator($comments);
-        $paginator->setItemCountPerPage(isset($config['itemCountPerPage']) ? $config['itemCountPerPage'] : 6);
-        $paginator->setCurrentPageNumber($page);
+        $paginator = $this->paginator->paginate($comments, $page, $config['itemCountPerPage'] ?? 6);
         if (isset($config['pageRange'])) {
             $paginator->setPageRange($config['pageRange']);
         }
 
-        $template = 'UniversalCommentBundle::container.html.twig';
-        if ($config['template'] != '') {
+        $template = '@UniversalComment/container.html.twig';
+        if (array_key_exists('template', $config)) {
             $template = $config['template'];
         }
 
         // get subcomments if replyable
         $subCommentsArray = [];
-        if (isset($config['replyable']) && $config['replyable']) {
+        if (array_key_exists('replyable', $config) && $config['replyable']) {
             /**
              * @var UniversalComment $comment
              */
@@ -85,12 +76,12 @@ class UniversalCommentHelper extends Helper
         }
 
         return $this->engine->render($template, [
-            'replyable' => ($config['replyable'] == true),
+            'replyable' => (array_key_exists('replyable', $config) && $config['replyable']),
             'comments' => $paginator,
-            'pagingVariables' => get_object_vars($paginator->getPages('Sliding')),
+            'pagingVariables' => $paginator->getPaginationData(),
             'pageParam' => isset($config['pageParam']) ? $config['pageParam'] : 'page',
             'id' => $id,
-            'validatedOnly' => ($config['validatedOnly'] == true),
+            'validatedOnly' => (array_key_exists('validatedOnly', $config) && $config['validatedOnly'] == true),
             'subComments' => $subCommentsArray
         ]);
     }

@@ -9,6 +9,7 @@
 namespace MercuryKojo\Bundle\UniversalCommentBundle;
 
 use Pimcore\Extension\Bundle\AbstractPimcoreBundle;
+use MercuryKojo\Bundle\UniversalCommentBundle\Installation\Installer;
 
 class UniversalCommentBundle extends AbstractPimcoreBundle
 {

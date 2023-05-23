@@ -1,11 +1,12 @@
-{#
-@var \Pimcore\Templating\PhpEngine $this
-@var \Pimcore\Templating\PhpEngine $view
-@var \Pimcore\Templating\GlobalVariables $app
-#}
 {% do jsConfig().add({'summernote': true}) %}
 {% if app.user %}
-    <h5 class="m-t-60 m-b-20">{{ 'ucb.Write a comment'|trans }}</h5>
+    <script src="https://cdn.tiny.cloud/1/qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc/tinymce/6/tinymce.min.js"></script>
+    <script>
+        tinymce.init({
+            selector: 'textarea.summernote'
+          });
+    </script>
+    <h4 class="text-xl font-bold mt-5 mb-2">{{ 'ucb.Write a comment'|trans }}</h4>
     <form action="{{ path('ucb_comment_add') }}" method="post">
         <input type="hidden" name="_target_path" value="{{ app.request.pathInfo }}">
         <input type="hidden" name="id" value="{{ id }}">
@@ -13,10 +14,10 @@
             <input type="hidden" name="commendId" value="{{ commentId }}">
         {% endif %}
         <textarea class="summernote" name="editordata"></textarea>
-        <button class="btn btn-primary btn-shadow float-right" type="submit">{{ 'ucb.form.Submit'|trans }}</button>
+        <button class="mt-2 text-white bg-blue-600 border border-white hover:border-blue-600 hover:bg-white hover:text-blue-600 rounded-sm px-3 py-2 float-right" type="submit">{{ 'ucb.form.Submit'|trans }}</button>
     </form>
 {% else %}
-    <div class="alert alert-info">
+    <div class="p-3 bg-amber-300 border border-amber-800">
         {{ 'ucb.If you want to participate in the discussions. Please log in or consider registering'|trans|raw }}
     </div>
 {% endif %}

@@ -1,6 +1,7 @@
 <?php
 namespace MercuryKojo\Bundle\UniversalCommentBundle\Twig;
 
+use Carbon\Carbon;
 use MercuryKojo\Bundle\UniversalCommentBundle\Templating\Helper\UniversalCommentHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -26,7 +27,12 @@ class Extensions extends AbstractExtension
     {
         return [
             new TwigFunction('universalComment', [$this, 'universalComment'], [ 'is_safe' => ['html'] ]),
+            new TwigFunction('ucb_carbon', [$this, 'createCarbonFromTimestamp'], [ 'is_safe' => ['html'] ]),
         ];
+    }
+
+    public function createCarbonFromTimestamp($timestamp, $tz = null) {
+        return Carbon::createFromTimestamp($timestamp, $tz);
     }
 
     /**

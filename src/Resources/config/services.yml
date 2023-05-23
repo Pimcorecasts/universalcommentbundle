@@ -16,12 +16,8 @@ services:
     tags: ['twig.extension']
 
 
-  MercuryKojo\Bundle\UniversalCommentBundle\Installer:
+  MercuryKojo\Bundle\UniversalCommentBundle\Installation\Installer:
     public: true
-    arguments:
-      # fetch the bundle via expression language
-      $bundle: "@=service('kernel').getBundle('UniversalCommentBundle')"
-
 
   MercuryKojo\Bundle\UniversalCommentBundle\Templating\Helper\UniversalCommentHelper:
     public: true

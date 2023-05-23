@@ -1,30 +1,31 @@
 {% set user = comment.poster %}
 {% set url = pimcore_url({'object': user}) %}
-<li class="forum-reply">
-    <div class="forum-header">
-        <div>
-            {% if user and user.image|default(false) %}
-                <a href="{{ url }}">{{ user.image.thumbnail('profile-img-sm').html({'height': 45})|raw }}</a>
-            {% endif %}
-        </div>
-        <div>
-            <div class="forum-title">
-                <h5><a href="{{ url }}">{{ user.username }}</a></h5>
-            </div>
-            <div class="forum-meta">
-                <span>{{ user.plan ? user.plan.name : ('ucb.post.Free'|trans) }} {{ 'ucb.post.Member'|trans }}</span>
-                {% if replyable|default(false) and app.user %}
-                    <span><a href="#"><i class="fa fa-mail-reply-all"></i> Reply</a></span>
+{% set creationDate = ucb_carbon(comment.creationDate) %}
+
+<li class="grid grid-cols-4 gap-4 my-3">
+    <div>
+        <div class="flex items-center">
+            <div class="mr-2">
+                {% if user and user.image|default(false) %}
+                    <a href="{{ url }}">{{ user.image.thumbnail('profile-img-sm').html({'height': 45, imgAttributes: {class: 'rounded-full'}})|raw }}</a>
                 {% endif %}
+            </div>
+            <div>
+                <span class="text-sm text-black/50">{{ creationDate.diffForHumans }}</span>
+                <h5><a href="{{ url }}" class="font-semibold">{{ user.username }}</a></h5>
+                <div class="forum-meta">
+                    {% if replyable|default(false) and app.user %}
+                        <span><a href="#"><i class="fa fa-mail-reply-all"></i> Reply</a></span>
+                    {% endif %}
+                </div>
                 {% if app.user and ('ROLE_UCB_ADMIN' in app.user.roles or (user and user.id == app.user.id)) %}
-                    <span><a href="{{ path('ucb_comment_remove',{ 'id': comment.id, '_target_path': app.request.pathInfo ~ '#' ~ id }) }}"><i class="fa fa-trash"></i> {{ 'ucb.Delete Post'|trans }}</a></span>
+                    <span class="text-sm text-red-700"><a href="{{ path('ucb_comment_remove',{ 'id': comment.id, '_target_path': app.request.pathInfo ~ '#' ~ id }) }}">{{ include('Svg/trash.html.twig', {svgClass: 'w-4 h-4 inline-block'}) }} {{ 'ucb.Delete Post'|trans }}</a></span>
                 {% endif %}
             </div>
         </div>
-        {% set creationDate = carbon().createFromTimestamp(comment.creationDate) %}
-        <div><span>{{ creationDate.isToday() ? creationDate.format('H:i') : creationDate.formatLocalized('%B %d, %Y') }}</span></div>
     </div>
-    <div class="forum-body">
+    <div class="col-span-3 text-black/75">
+        <span class="text-sm ">&nbsp;</span>
         {{ comment.content|raw }}
     </div>
 </li>
