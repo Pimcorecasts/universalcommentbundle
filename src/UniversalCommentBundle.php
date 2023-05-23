@@ -13,18 +13,17 @@ use MercuryKojo\Bundle\UniversalCommentBundle\Installation\Installer;
 
 class UniversalCommentBundle extends AbstractPimcoreBundle
 {
-    public function getInstaller()
-    {
+    public function getInstaller(): \Pimcore\Extension\Bundle\Installer\InstallerInterface|null{
         return $this->container->get(Installer::class);
     }
 
 
-    public function getVersion()
+    public function getVersion(): string
     {
         return '0.0.1b';
     }
 
-    public function getDescription()
+    public function getDescription(): string
     {
         return 'Universal Comment Bundle providing Templates, Objectstructures and Templating Helper';
     }
