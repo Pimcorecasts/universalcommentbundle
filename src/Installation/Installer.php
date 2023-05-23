@@ -12,8 +12,7 @@ class Installer extends AbstractInstaller
     /**
      * {@inheritdoc}
      */
-    public function install()
-    {
+    public function install(): void{
         if (!DataObject\ClassDefinition::getByName('UniversalComment')) {
             Console::exec('php ' . PIMCORE_PROJECT_ROOT . '/bin/console pimcore:definition:import:class ' . PIMCORE_PROJECT_ROOT . '/vendor/mercurykojo/pimcore-markdown-bundle/src/Installation/Definitions/class_UniversalComment_export.json -f');
         }
@@ -22,13 +21,11 @@ class Installer extends AbstractInstaller
     /**
      * @return bool
      */
-    public function needsReloadAfterInstall()
-    {
+    public function needsReloadAfterInstall(): bool{
         return true;
     }
 
-    public function isInstalled()
-    {
+    public function isInstalled(): bool{
         if(!DataObject\ClassDefinition::getByName('UniversalComment')) {
             return false;
         }
@@ -36,12 +33,11 @@ class Installer extends AbstractInstaller
         return true;
     }
 
-    public function canBeInstalled()
-    {
+    public function canBeInstalled(): bool{
         return !$this->isInstalled();
     }
 
-    public function uninstall()
+    public function uninstall():void
     {
     }
 
