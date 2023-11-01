@@ -8,14 +8,14 @@
 
 namespace MercuryKojo\Bundle\UniversalCommentBundle\Controller;
 
+use MercuryKojo\Bundle\UniversalCommentBundle\Event\ValidateCommentEvent;
 use Pimcore\Controller\FrontendController;
-use Pimcore\File;
-use Pimcore\Log\ApplicationLogger;
+use Pimcore\Bundle\ApplicationLoggerBundle\ApplicationLogger;
 use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\Service;
 use Pimcore\Model\DataObject\UniversalComment;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -36,23 +36,22 @@ class UniversalCommentController extends FrontendController {
         $this->logger = $logger;
     }
 
-    public function onKernelController(FilterControllerEvent $event)
-    {
-        parent::onKernelController($event);
-        $this->setViewAutoRender($event->getRequest(), true, 'twig');
-    }
-
     /**
      * @Route("/comment/add", name="ucb_comment_add")
      * @param Request $request
      * @throws \Exception
      */
-    public function addComment(Request $request, UserInterface $user = null)
+    public function addComment(Request $request, EventDispatcherInterface $dispatcher, UserInterface $user = null)
     {
         $content = $request->get('editordata');
         $id = $request->get('id');
 
-        if ($content != '' && $id != '') {
+        $validateEvent = $dispatcher->dispatch(new ValidateCommentEvent('validateComment', [
+            'id' => $id,
+            'content' => $content
+        ]), ValidateCommentEvent::EVENT_NAME);
+
+        if ($validateEvent->isCommentValid()) {
             $comment = new UniversalComment();
             $comment->setPublished(true);
             $comment->setParent(Service::createFolderByPath('Comments/' . $id . '/'));
@@ -70,9 +69,7 @@ class UniversalCommentController extends FrontendController {
             $comment->setContent($content);
             $comment->setSourceId($id);
 
-            // TODO preAdd Event
             $comment->save();
-            // TODO postAdd Event
         } else {
             $this->logger->warning('No Content Comment. Data: ' . json_encode($request->request->all()), ['component' => 'UniversalCommentBundle']);
         }
